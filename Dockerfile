@@ -2,7 +2,7 @@
 FROM node:18
 
 # Set direktori kerja di dalam container
-WORKDIR /app
+WORKDIR /usr/src/app
 
 # Copy package.json dan package-lock.json
 COPY package*.json ./
@@ -14,7 +14,7 @@ RUN npm install
 COPY . .
 
 # Jalankan aplikasi
-CMD ["node", "server.js"]
+CMD ["node", "src/server.js"]
 
 # Ekspose port aplikasi
 EXPOSE 3000
