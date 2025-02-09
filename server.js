@@ -7,7 +7,7 @@ const app = express()
 app.use(express.json())
 
 // Koneksi ke Elasticsearch
-const esClient = new Client({ node: 'http://localhost:9200' })
+const esClient = new Client({ node: process.env.ELASTICSEARCH_CLIENT })
 
 // Cek koneksi
 esClient.ping()
@@ -15,12 +15,55 @@ esClient.ping()
   .catch(err => console.error('Elasticsearch connection error:', err))
 
 // koneksi ke redis
-const redisClient = redis.createClient({ url: 'redis://redis:6379' })
+const redisClient = redis.createClient({ url: process.env.REDIS_CLIENT })
+const redisPublisher = redis.createClient({ url: process.env.REDIS_CLIENT })
+const redisSubscriber = redis.createClient({ url: process.env.REDIS_CLIENT })
 
-redisClient.connect()
+(async () => {
+  await redisClient.connect()
+  await redisPublisher.connect()
+  await redisSubscriber.connect()
+})()
 
 redisClient.on('connect', () => console.log('Connected to Redis'))
 redisClient.on('error', (err) => console.error('Redis Error:', err))
+
+// reminder endpoint
+app.post('/reminders', async (req, res) => {
+  try {
+    const { id, message, delay } = req.body
+    const key = `reminder:${id}`
+
+    await redisClient.setEx(key, delay, message)
+
+    res.json({ status: 'Reminder set', id, message, delay })
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+})
+
+async function checkReminders () {
+  const keys = await redisClient.keys('reminder:*')
+  for (const key of keys) {
+    const ttl = await redisClient.ttl(key)
+    if (ttl === 0) {
+      const message = await redisClient.get(key)
+      if (message) {
+        await redisPublisher.publish('reminder_alerts', JSON.stringify({ key, message }))
+        await redisClient.del(key)
+      }
+    }
+  }
+}
+
+// set interval checkreminders setiap detik
+setInterval(checkReminders, 1000)
+
+// handle alert
+redisSubscriber.subscribe('reminder_alerts', (message) => {
+  const data = JSON.parse(message)
+  console.log(`Reminder Alert: ${data.message}`)
+})
 
 // Route untuk menambahkan data ke Elasticsearch
 app.post('/documents', async (req, res) => {

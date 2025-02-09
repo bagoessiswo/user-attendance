@@ -1,4 +1,33 @@
 services:
+  app:
+    build: .
+    container_name: express_app
+    depends_on:
+      - mysql
+      - redis
+      - elasticsearch
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    volumes:
+      - .:/usr/src/app
+    restart: always
+  
+  mysql:
+    image: mysql:8
+    container_name: mysql_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: attendance_db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: userpassword
+    ports:
+      - "3310:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.6.0
     container_name: elasticsearch
@@ -9,10 +38,18 @@ services:
       - xpack.security.enabled=false
     ports:
       - "9200:9200"
-      
+    volumes:
+      - elastic_data:/usr/share/elasticsearch/data
+
   redis:
     image: redis:latest
     container_name: redis
+    restart: always
     ports:
       - "6379:6379"
-    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+volumes:
+  mysql_data:
+  redis_data:
+  elastic_data:
