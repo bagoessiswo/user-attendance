@@ -73,13 +73,13 @@ router.post('/login', [
  *             properties:
  *               name:
  *                 type: string
- *                 example: "John Doe"
+ *                 example: "John"
  *               email:
  *                 type: string
- *                 example: "john@example.com"
+ *                 example: "john@gmail.com"
  *               password:
  *                 type: string
- *                 example: "password123"
+ *                 example: "123456"
  *     responses:
  *       201:
  *         description: User berhasil didaftarkan
@@ -142,13 +142,13 @@ router.get('/me', auth, async (req, res) => {
  *             properties:
  *               name:
  *                 type: string
- *                 example: "John Doe"
+ *                 example: "John"
  *               email:
  *                 type: string
- *                 example: "john@example.com"
+ *                 example: "john@gmail.com"
  *               password:
  *                 type: string
- *                 example: "password123"
+ *                 example: "123456"
  *     responses:
  *       200:
  *         description: User berhasil diupdate

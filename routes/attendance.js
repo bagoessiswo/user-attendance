@@ -42,12 +42,6 @@ router.post('/checkin', auth, async (req, res) => {
  *   post:
  *     summary: Check-out user
  *     tags: [Attendance]
- *     components:
- *       securitySchemes:
- *         bearerAuth:
- *           type: http
- *           scheme: bearer
- *           bearerFormat: JWT
  *     security:
  *       - bearerAuth: []
  *     responses:

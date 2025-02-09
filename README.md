@@ -38,7 +38,7 @@ Once the application is running, you can access it at `http://localhost:3000`.
 
 ### Documentation
 
-For documentation please visit `http://localhost:3000/api-docs`
+For documentation please visit `http://localhost:3000/api-docs` also in docs folder
 
 ### License
 
