@@ -1,7 +1,7 @@
 require('dotenv').config()
 const express = require('express')
 const setupSwagger = require('./config/swagger')
-require('./subscribers/redisSubscriber')
+require('./subscribers/redisSubscribers')
 require('./jobs/attendanceReminderJob')
 
 const app = express()

@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "main": "server.js",
   "scripts": {
-    "starts": "node src/server.js"
+    "migration": "cd src && npx sequelize-cli db:migrate && cd ..",
+    "start": "node src/server.js"
   },
   "keywords": [],
   "author": "",

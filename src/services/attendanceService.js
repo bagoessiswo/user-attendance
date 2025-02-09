@@ -1,6 +1,7 @@
 const { addDocument, getDocument, updateDocument } = require('./elasticService')
 const { getCache, setCache, deleteCache, publishMessage } = require('./redisService')
-const Attendance = require('../models/Attendance')
+const Models = require('../models/index.js')
+const Attendance = Models.attendance
 
 const INDEX = 'attendance'
 

@@ -10,8 +10,6 @@ COPY package*.json ./
 # Install dependencies
 RUN npm install
 
-RUN cd src && npx sequelize-cli db:migrate && cd ..
-
 # Copy semua file proyek ke dalam container
 COPY . .
 
@@ -19,4 +17,4 @@ COPY . .
 EXPOSE 3000
 
 # Jalankan aplikasi
-CMD ["npm", "start"]
+CMD npm run start

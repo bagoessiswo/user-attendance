@@ -4,7 +4,8 @@ const jwt = require('jsonwebtoken')
 const { addDocument, getDocument, updateDocument, deleteDocument, searchDocument } = require('./elasticService')
 const { getCache, setCache, deleteCache, publishMessage } = require('./redisService')
 
-const User = require('../models/User.2js')
+const Models = require('../models/index.js')
+const User = Models.user
 
 const INDEX = 'users'
 const JWT_SECRET = process.env.JWT_SECRET

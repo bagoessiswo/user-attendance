@@ -5,13 +5,11 @@ module.exports = {
     await queryInterface.createTable('Attendances', {
       id: {
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
         type: Sequelize.UUID
       },
       user_id: {
-        type: Sequelize.STRING,
-        allowNull: false,
+        type: Sequelize.UUID,
         references: {
           model: 'Users',
           key: 'id'

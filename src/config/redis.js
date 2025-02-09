@@ -1,8 +1,8 @@
 const redis = require('redis')
 
-const redisClient = redis.createClient({ url: process.env.REDIS_CLIENT })
-const redisPublisher = redis.createClient({ url: process.env.REDIS_CLIENT })
-const redisSubscriber = redis.createClient({ url: process.env.REDIS_CLIENT });
+const redisClient = redis.createClient({ host: process.env.REDIS_HOST, port: process.env.REDIS_PORT })
+const redisPublisher = redis.createClient({ host: process.env.REDIS_HOST, port: process.env.REDIS_PORT })
+const redisSubscriber = redis.createClient({ host: process.env.REDIS_HOST, port: process.env.REDIS_PORT });
 
 (async () => {
   await redisClient.connect()
