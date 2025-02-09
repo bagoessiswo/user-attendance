@@ -4,20 +4,61 @@ const auth = require('../middleware/auth')
 
 const router = express.Router()
 
-// Check-in
-router.post('/checkin', auth, async (req, res) => {
-  const { id, name, email } = req.user
-  const response = await checkIn(id, name, email)
+/**
+ * @swagger
+ * tags:
+ *   name: Attendance
+ *   description: API untuk sistem absensi
+ */
 
-  res.json({ status: 'Checked in', ...response })
+/**
+ * @swagger
+ * /attendance/checkin:
+ *   post:
+ *     summary: Check-in user
+ *     tags: [Attendance]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Check-in berhasil
+ *       401:
+ *         description: Unauthorized
+ */
+router.post('/checkin', auth, async (req, res) => {
+  try {
+    const { id, name, email } = req.user
+    const response = await checkIn(id, name, email)
+
+    res.json({ status: 'Checked in', ...response })
+  } catch (err) {
+    res.status(500).json({ error: 'Internal Server Error' })
+  }
 })
 
-// Check-out
+/**
+ * @swagger
+ * /attendance/checkout:
+ *   post:
+ *     summary: Check-out user
+ *     tags: [Attendance]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Check-out berhasil
+ *       401:
+ *         description: Unauthorized
+ */
 router.post('/checkout', auth, async (req, res) => {
-  const { id, name, email } = req.user
-  const response = await checkOut(id, name, email)
+  try {
+    const { id, name, email } = req.user
+    const response = await checkOut(id, name, email)
 
-  res.json({ status: 'Checked out', ...response })
+    res.json({ status: 'Checked out', ...response })
+  } catch (err) {
+    res.status(500).json({ error: 'Internal Server Error' })
+  }
 })
 
 // Lihat riwayat absensi

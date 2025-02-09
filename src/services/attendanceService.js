@@ -1,5 +1,6 @@
 const { addDocument, getDocument, updateDocument } = require('./elasticService')
 const { getCache, setCache, deleteCache, publishMessage } = require('./redisService')
+const Attendance = require('../models/Attendance')
 
 const INDEX = 'attendance'
 
@@ -7,7 +8,10 @@ const INDEX = 'attendance'
 async function checkIn (userId, name, email) {
   const timestamp = new Date().toISOString()
 
-  const response = await addDocument(INDEX, userId, { id: userId, name, check_in: timestamp, check_out: null })
+  // Simpan di MySQL
+  const attendance = await Attendance.create({ user_id: userId, check_in: timestamp, check_out: null })
+
+  const response = await addDocument(INDEX, attendance.id, { user_id: userId, name, check_in: timestamp, check_out: null })
 
   // Hapus cache lama di Redis dan kirim event real-time
   await deleteCache(`${INDEX}:${userId}`)
@@ -19,7 +23,15 @@ async function checkIn (userId, name, email) {
 // Check-out
 async function checkOut (userId, name, email) {
   const timestamp = new Date().toISOString()
-  const response = await updateDocument(INDEX, userId, {
+
+  // Update di MySQL
+  const attendance = await Attendance.findOne({ where: { user_id: userId, check_out: null } })
+  if (!attendance) throw new Error('No active check-in found')
+
+  attendance.check_out = timestamp
+  await attendance.save()
+
+  const response = await updateDocument(INDEX, attendance.id, {
     check_out: timestamp
   })
 
