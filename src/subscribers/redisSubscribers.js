@@ -1,12 +1,13 @@
 const { redisSubscriber } = require('../config/redis')
 const sendEmail = require('../config/email')
 
-redisSubscriber.subscribe('reminder_alerts', async (message) => {
-  const data = JSON.parse(message)
-  console.log(`Reminder Alert: ${data.message} - Sending Email to ${data.email}`)
+redisSubscriber.subscribe('attendance_updates', async (message) => {
+  const { action, email, name, timestamp } = JSON.parse(message)
 
-  if (data.email) {
-    await sendEmail(data.email, 'Reminder Notification', data.message)
+  if (action === 'checkin') {
+    sendEmail(email, 'Check-in Reminder', `Hi ${name},\n\nYou have successfully checked in at ${timestamp}.\n\nThank you!`)
+  } else if (action === 'checkout') {
+    sendEmail(email, 'Check-out Reminder', `Hi ${name},\n\nYou have successfully checked out at ${timestamp}.\n\nSee you next time!`)
   }
 })
 
