@@ -28,12 +28,12 @@ const router = express.Router()
  *             properties:
  *               email:
  *                 type: string
- *                 example: "john@example.com"
+ *                 example: "john@gmail.com"
  *               password:
  *                 type: string
- *                 example: "password123"
+ *                 example: "123456"
  *     responses:
- *       201:
+ *       200:
  *         description: User berhasil login
  *       400:
  *         description: Input tidak valid
@@ -98,9 +98,9 @@ router.post('/register', [
     const { name, email, password } = req.body
     const response = await register({ name, email, password })
 
-    res.status(201).json({ status: 'User register', ...response })
+    return res.status(201).json({ status: 'User register', ...response })
   } catch (err) {
-    res.status(500).json({ error: 'Internal Server Error' })
+    return res.status(500).json({ error: 'Internal Server Error' })
   }
 })
 

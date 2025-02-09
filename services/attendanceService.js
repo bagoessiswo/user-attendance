@@ -1,5 +1,5 @@
-const { addDocument, getDocument, updateDocument } = require('./elasticService')
-const { getCache, setCache, deleteCache, publishMessage } = require('./redisService')
+const { addDocument, getDocument, updateDocument } = require('./elasticService.js')
+const { getCache, setCache, deleteCache, publishMessage } = require('./redisService.js')
 const Models = require('../models/index.js')
 const Attendance = Models.attendance
 
@@ -12,13 +12,13 @@ async function checkIn (userId, name, email) {
   // Simpan di MySQL
   const attendance = await Attendance.create({ user_id: userId, check_in: timestamp, check_out: null })
 
-  const response = await addDocument(INDEX, attendance.id, { user_id: userId, name, check_in: timestamp, check_out: null })
+  await addDocument(INDEX, attendance.id, { user_id: userId, name, check_in: timestamp, check_out: null })
 
   // Hapus cache lama di Redis dan kirim event real-time
   await deleteCache(`${INDEX}:${userId}`)
   await publishMessage('attendance_updates', JSON.stringify({ action: 'checkin', userId, name, email, timestamp }))
 
-  return { fromCache: false, data: response }
+  return { fromCache: false, data: attendance }
 }
 
 // Check-out
@@ -32,7 +32,7 @@ async function checkOut (userId, name, email) {
   attendance.check_out = timestamp
   await attendance.save()
 
-  const response = await updateDocument(INDEX, attendance.id, {
+  await updateDocument(INDEX, attendance.id, {
     check_out: timestamp
   })
 
@@ -40,7 +40,7 @@ async function checkOut (userId, name, email) {
   await deleteCache(`${INDEX}:${userId}`)
   await publishMessage('attendance_updates', JSON.stringify({ action: 'checkout', userId, name, email, timestamp }))
 
-  return { fromCache: false, data: response }
+  return { fromCache: false, data: attendance }
 }
 
 // Ambil riwayat absensi user
@@ -50,7 +50,7 @@ async function getAttendance (userId) {
     const cachedData = await getCache(cacheKey)
     if (cachedData) return { fromCache: true, data: JSON.parse(cachedData) }
 
-    const response = await getDocument(INDEX, userId)
+    const response = (await getDocument(INDEX, userId))._source
     await setCache(cacheKey, 60, JSON.stringify(response))
     return { fromCache: false, data: response }
   } catch (error) {

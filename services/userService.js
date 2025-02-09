@@ -1,10 +1,10 @@
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 
-const { addDocument, getDocument, updateDocument, deleteDocument, searchDocument } = require('./elasticService')
+const { addDocument, getDocument, updateDocument, deleteDocument } = require('./elasticService')
 const { getCache, setCache, deleteCache, publishMessage } = require('./redisService')
 
-const Models = require('../models/index.js')
+const Models = require('../models/index')
 const User = Models.user
 
 const INDEX = 'users'
@@ -18,6 +18,7 @@ async function register (user) {
   const existedUser = await User.findOne({
     where: { email }
   })
+
   if (existedUser) {
     return { fromCache: false, data: null }
   }
@@ -25,28 +26,29 @@ async function register (user) {
   const newUser = await User.create({
     name,
     email,
-    hashedPassword
+    password: hashedPassword
   })
 
   const id = newUser.id
   const timestamp = newUser.created_at
-  const response = await addDocument(INDEX, id, { name, email, password: hashedPassword, created_at: timestamp, updated_at: null })
+  await addDocument(INDEX, id, { name, email, password: hashedPassword, created_at: timestamp, updated_at: null })
 
   await deleteCache(`${INDEX}:${id}`)
   await publishMessage('user_updates', JSON.stringify({ action: 'register', id, name, email }))
 
-  return { fromCache: false, data: response }
+  return { fromCache: false, data: newUser }
 }
 
-async function login (email, password) {
-  const { hits } = await searchDocument({
-    INDEX,
-    query: { match: { email } }
+async function login (credentials) {
+  const { email, password } = credentials
+  const user = await User.findOne({
+    where: {
+      email
+    }
   })
 
-  if (hits.total.value === 0) return null
+  if (!user) return null
 
-  const user = hits.hits[0]._source
   const isMatch = await bcrypt.compare(password, user.password)
   if (!isMatch) return null
 
@@ -61,7 +63,7 @@ async function getUser (id) {
     const cachedData = await getCache(cacheKey)
     if (cachedData) return { fromCache: true, data: JSON.parse(cachedData) }
 
-    const response = await getDocument(INDEX, id)
+    const response = (await getDocument(INDEX, id))._source
     await setCache(cacheKey, 60, JSON.stringify(response))
     return { fromCache: false, data: response }
   } catch (error) {
@@ -90,12 +92,20 @@ async function updateUser (id, user) {
     }
   })
 
-  const response = await updateDocument(INDEX, id, { name, email, password: hashedPassword, updated_at: timestamp })
+  await updateDocument(INDEX, id, { name, email, password: hashedPassword, updated_at: timestamp })
 
   await deleteCache(`${INDEX}:${id}`)
   await publishMessage('user_updates', JSON.stringify({ action: 'update', id, name, email }))
 
-  return { fromCache: false, data: response }
+  return {
+    fromCache: false,
+    data: {
+      id,
+      name,
+      email,
+      password: hashedPassword
+    }
+  }
 }
 
 // Hapus user
@@ -105,12 +115,12 @@ async function deleteUser (id) {
       id
     }
   })
-  const response = await deleteDocument(INDEX, id)
+  await deleteDocument(INDEX, id)
 
   await deleteCache(`${INDEX}:${id}`)
   await publishMessage('user_updates', JSON.stringify({ action: 'delete', id }))
 
-  return { fromCache: false, data: response }
+  return { fromCache: false }
 }
 
 module.exports = { register, login, getUser, updateUser, deleteUser }

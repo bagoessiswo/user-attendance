@@ -9,11 +9,20 @@ const options = {
       version: '1.0.0',
       description: 'API untuk sistem absensi dengan Express, MySQL, Redis, dan Elasticsearch'
     },
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT'
+        }
+      }
+    },
     servers: [
-      { url: 'http://localhost:3000' }
+      { url: `http://localhost:${process.env.APP_PORT || 4000}` }
     ]
   },
-  apis: ['./src/routes/*.js']
+  apis: ['./routes/*.js']
 }
 
 const swaggerSpec = swaggerJSDoc(options)

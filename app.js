@@ -6,6 +6,7 @@ require('./jobs/attendanceReminderJob')
 
 const app = express()
 app.use(express.json())
+
 setupSwagger(app)
 // router
 const attendanceRoutes = require('./routes/attendance')
@@ -15,7 +16,7 @@ app.use('/attendance', attendanceRoutes)
 app.use('/auth', userRoutes)
 
 // Menjalankan server
-const PORT = process.env.PORT || 3000
+const PORT = process.env.APP_PORT || 4000
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`)
 })

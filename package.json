@@ -1,10 +1,10 @@
 {
   "name": "user-attendance",
   "version": "1.0.0",
-  "main": "server.js",
+  "main": "app.js",
   "scripts": {
-    "migration": "cd src && npx sequelize-cli db:migrate && cd ..",
-    "start": "node src/server.js"
+    "migration": "npx sequelize-cli db:migrate",
+    "start": "node app.js"
   },
   "keywords": [],
   "author": "",
@@ -20,6 +20,7 @@
     "mysql2": "^3.12.0",
     "node-cron": "^3.0.3",
     "nodemailer": "^6.10.0",
+    "nodemon": "^3.1.9",
     "redis": "^4.7.0",
     "sequelize": "^6.37.5",
     "sequelize-cli": "^6.6.2",
