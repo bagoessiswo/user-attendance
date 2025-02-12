@@ -3,7 +3,7 @@
     "username": "user",
     "password": "userpassword",
     "database": "attendance_db",
-    "host": "localhost",
+    "host": "mysql",
     "port": "3308",
     "dialect": "mysql"
   },
@@ -11,16 +11,16 @@
    "username": "user",
     "password": "userpassword",
     "database": "attendance_db",
-    "host": "localhost",
-    "port": "3308",
+    "host": "mysql",
+    "port": "3306",
     "dialect": "mysql"
   },
   "production": {
    "username": "user",
     "password": "userpassword",
     "database": "attendance_db",
-    "host": "localhost",
-    "port": "3308",
+    "host": "mysql",
+    "port": "3306",
     "dialect": "mysql"
   }
 }

@@ -17,4 +17,4 @@ COPY . .
 EXPOSE 3000
 
 # Jalankan aplikasi
-CMD npm run start
+CMD npm run migration && npm run start

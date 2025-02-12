@@ -13,6 +13,8 @@ services:
       - "3308:3308"
     volumes:
       - mysql_data:/var/lib/mysql
+    networks:
+      - myapp_network
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.6.0
@@ -26,6 +28,8 @@ services:
       - "9200:9200"
     volumes:
       - elastic_data:/usr/share/elasticsearch/data
+    networks:
+      - myapp_network
 
   redis:
     image: redis:latest
@@ -35,21 +39,29 @@ services:
       - "6379:6379"
     volumes:
       - redis_data:/data
+    networks:
+      - myapp_network
     
-  # app:
-  #   build: .
-  #   container_name: express_app
-  #   depends_on:
-  #     - mysql
-  #     - redis
-  #     - elasticsearch
-  #   ports:
-  #     - "3000:3000"
-  #   env_file:
-  #     - .env
-  #   volumes:
-  #     - .:/usr/src/app
-  #   restart: always
+  app:
+    build: .
+    container_name: express_app
+    depends_on:
+      - mysql
+      - redis
+      - elasticsearch
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    volumes:
+      - .:/usr/src/app
+    restart: always
+    networks:
+      - myapp_network
+
+networks:
+  myapp_network:
+    driver: bridge
 
 volumes:
   mysql_data:

@@ -22,16 +22,6 @@ Make sure you have the following installed:
   docker-compose up
   ```
 
-3. **Run database migrations:**
-  ```bash
-  npm run migration
-  ```
-
-4. **Start the application:**
-  ```bash
-  npm run start
-  ```
-
 ### Usage
 
 Once the application is running, you can access it at `http://localhost:3000`.
